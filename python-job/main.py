@@ -60,7 +60,7 @@ def retrieveOpenMeteoData():
 
 
 def getGeminiaiRecommendation(weatherData):
-    client = genai.Client(api_key="AIzaSyBhg8iWTyVz-Lp76clb_Ib6xyWv1L1MadU")
+    client = genai.Client(api_key="")
 
     prompt = f"""
         Você é um assistente especializado em clima e estilo de vida. 
