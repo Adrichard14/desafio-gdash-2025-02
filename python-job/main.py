@@ -1,7 +1,7 @@
-import asyncio
 import schedule
 import json
 import time
+from datetime import datetime
 
 from rabbitmq_client import getConnection
 
@@ -14,11 +14,18 @@ def retrieveOpenMeteoData():
     lon = -37.0667
 
     url = "https://api.open-meteo.com/v1/forecast"
+    today = datetime.today().date()
+
+    start_date = today.strftime("%Y-%m-%d")
+    end_date = today.strftime("%Y-%m-%d")
     params = {
         "latitude": lat,
         "longitude": lon,
         "current_weather": True,
-        "hourly": "temperature_2m"
+        "timezone": "auto",
+        "hourly": "uv_index,temperature_2m,precipitation_probability,relative_humidity_2m",
+        "start_date": start_date,
+        "end_date": end_date
     }
     print('sending open meteo request')
     response = requests.get(url, params=params)
@@ -33,10 +40,6 @@ def retrieveOpenMeteoData():
     state = address.get("state")
     country = address.get("country")
 
-    rawResponse = getGeminiaiRecommendation(data)
-
-    recommendation_data = {"recommendation": rawResponse}
-
     data["location"] = {
         "city": city,
         "state": state,
@@ -45,7 +48,6 @@ def retrieveOpenMeteoData():
 
     message = {
         "weatherData": data,
-        "recommendation": recommendation_data["recommendation"]
     }
 
     channel, connection = getConnection()
@@ -57,28 +59,6 @@ def retrieveOpenMeteoData():
     )
     print('Message successfully sent to the queue')
     connection.close()
-
-
-def getGeminiaiRecommendation(weatherData):
-    client = genai.Client(api_key="")
-
-    prompt = f"""
-        Você é um assistente especializado em clima e estilo de vida. 
-        Com base nos seguintes dados meteorológicos retornados pela API Open-Meteo:
-
-        {json.dumps(weatherData)}
-
-        Gere recomendações, dicas práticas ou alertas relevantes para uma pessoa que está nessa região. 
-        Considere um limite de 700 caracteres: a resposta deve ser objetiva e não muito longa. 
-        Utilize emojis para deixar as respostas mais descontraídas.
-
-        Responda SOMENTE com o texto puro, sem blocos de código, sem formatação markdown e sem explicações adicionais.
-        """
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
-    )
-    return response.text
 
 
 schedule.every(3).minutes.do(retrieveOpenMeteoData)
