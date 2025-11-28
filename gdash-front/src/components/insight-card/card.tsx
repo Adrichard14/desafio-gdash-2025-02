@@ -86,13 +86,6 @@ const AIInsightsCard: React.FC<AIInsightsCardProps> = ({
                                 </div>
                             </div>
                         </div>
-
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
-                                <span>Powered by Google Gemini</span>
-                            </div>
-                        </div>
                     </div>
                 )}
 

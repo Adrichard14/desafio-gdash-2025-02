@@ -6,7 +6,6 @@ import {
     CloudRain,
     Wind,
     Droplets,
-    Eye,
     Activity,
     Map,
     Settings,
@@ -20,7 +19,7 @@ import { weatherCodeMap } from '../lib/utils';
 import { useInsights } from '../hooks/useInsights';
 import AIInsightsCard from '../components/insight-card/card';
 
-const WeatherDashboard = () => {
+const DashboardPage = () => {
     const { data, loading, error, refetch } = useWeather();
     const { insights, loading: insightsLoading, error: insightsError, refetch: insightsRefresh } = useInsights();
     const current_weather = data?.body.weatherData?.current_weather;
@@ -203,21 +202,12 @@ const WeatherDashboard = () => {
                                 <CardTitle className="text-lg">Condições Atuais</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="p-3 bg-green-50 rounded-lg">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium text-gray-700">Qualidade do Ar</span>
-                                        <Eye className="w-4 h-4 text-green-600" />
-                                    </div>
-                                    <p className="text-2xl font-bold text-green-600">Boa</p>
-                                    <p className="text-xs text-gray-500 mt-1">AQI: 42</p>
-                                </div>
-
                                 <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-sm font-medium text-gray-700">Vento</span>
                                         <Wind className="w-4 h-4 text-blue-600" />
                                     </div>
-                                    <p className="text-2xl font-bold text-blue-600">{current_weather?.windspeed}{current_weather_units?.windspeed}</p>
+                                    <p className="text-2xl font-bold text-blue-600">{current_weather?.windspeed} {current_weather_units?.windspeed}</p>
                                     <p className="text-xs text-gray-500 mt-1">Direção: Nordeste</p>
                                 </div>
 
@@ -253,4 +243,4 @@ const WeatherDashboard = () => {
     );
 };
 
-export default WeatherDashboard;
+export default DashboardPage;

@@ -1,6 +1,3 @@
-export interface InsightResponse {
-    insight: string;
-}
 
 export interface User {
     id: string;
