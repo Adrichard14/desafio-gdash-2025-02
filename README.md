@@ -1,5 +1,8 @@
 # Desafio para o processo seletivo GDASH 2025/02
 
+# Link para o vídeo não listado no youtube com a explicação da arquitetura:
+https://www.youtube.com/channel/UCiflNl4b2P7nPwwX8pJ2Jtg/posts?pvf=CAI%253D
+
 # Como executar o projeto utilizando docker
 
 ## Estrutura do Projeto
