@@ -9,7 +9,7 @@ import (
 )
 
 func sendToAPI(body []byte) bool {
-	url := "http://localhost:3004/api/weather"
+	url := "http://localhost:3006/api/weather"
 	maxRetries := 3
 	for i := 0; i < maxRetries; i++ {
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
