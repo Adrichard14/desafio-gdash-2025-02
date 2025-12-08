@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthService } from '../services/authService';
-import { useAuth } from '../contexts/authContext';
+import { AuthService } from '../services/authService'; // ← Importe direto o service
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
     const [formData, setFormData] = useState({
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: '',
+        name: ''
     });
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [localLoading, setLocalLoading] = useState(false);
 
-    const { updateUser } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,40 +24,53 @@ const LoginPage: React.FC = () => {
 
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!formData.email || !formData.password) {
-            setError('Email e senha são obrigatórios');
+        
+        if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+            setError('Todos os campos são obrigatórios');
             return;
         }
-
+        
+        if (formData.password !== formData.confirmPassword) {
+            setError('As senhas não coincidem');
+            return;
+        }
+        
         setError('');
-        setIsLoading(true);
+        setLocalLoading(true);
 
         try {
-            const response = await AuthService.login(formData);
-            updateUser(response.user);
+            // ← Chame direto o AuthService, sem passar pelo Context
+            await AuthService.register(formData);
             navigate('/dashboard');
         } catch (err: any) {
-            let errorMessage = 'Erro ao fazer login. Tente novamente.';
+            let errorMessage = 'Erro ao registrar. Tente novamente.';
             if (err?.response?.data?.message) {
-                errorMessage = err.response.data.message;
+                if (Array.isArray(err.response.data.message)) {
+                    errorMessage = err.response.data.message.join('; ');
+                } else {
+                    errorMessage = err.response.data.message;
+                }
             } else if (err?.response?.data?.error) {
-                errorMessage = err.response.data.error;
+                if (Array.isArray(err.response.data.error)) {
+                    errorMessage = err.response.data.error.join('; ');
+                } else {
+                    errorMessage = err.response.data.error;
+                }
             } else if (err?.message) {
                 errorMessage = err.message;
             }
-
+            
             setError(errorMessage);
         } finally {
-            setIsLoading(false);
+            setLocalLoading(false);
         }
-    }, [formData, updateUser, navigate]);
+    }, [formData, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
             <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
                 <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-                    Login
+                    Registrar
                 </h1>
 
                 {error && (
@@ -69,6 +82,21 @@ const LoginPage: React.FC = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Nome
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                            disabled={localLoading}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                             Email
                         </label>
                         <input
@@ -78,7 +106,7 @@ const LoginPage: React.FC = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
-                            disabled={isLoading}
+                            disabled={localLoading}
                         />
                     </div>
 
@@ -93,23 +121,38 @@ const LoginPage: React.FC = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
-                            disabled={isLoading}
+                            disabled={localLoading}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Confirmar senha
+                        </label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                            disabled={localLoading}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={localLoading}
                         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isLoading ? 'Entrando...' : 'Entrar'}
+                        {localLoading ? 'Registrando...' : 'Registrar'}
                     </button>
                 </form>
 
                 <p className="text-center text-sm text-gray-600 mt-4">
-                    Não tem uma conta?{' '}
-                    <Link to="/register" className="text-blue-600 hover:underline">
-                        Registre-se
+                    Já tem uma conta?{' '}
+                    <Link to="/login" className="text-blue-600 hover:underline">
+                        Fazer login
                     </Link>
                 </p>
             </div>
@@ -117,4 +160,4 @@ const LoginPage: React.FC = () => {
     );
 };
 
-export default LoginPage;
+export default RegisterPage;

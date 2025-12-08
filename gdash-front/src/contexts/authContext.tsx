@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { AuthService, LoginCredentials, RegisterCredentials } from "@/services/authService";
 import { User } from "../types/user";
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextData {
     user: User | null;
@@ -48,31 +48,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }, []);
 
     const login = async (credentials: LoginCredentials) => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
             const response = await AuthService.login(credentials);
             setUser(response.user);
         } catch (error) {
-            setIsLoading(false);
+            console.error('Erro no login:', error);
             throw error;
         } finally {
             setIsLoading(false);
         }
     };
-
     const register = async (credentials: RegisterCredentials) => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
             const response = await AuthService.register(credentials);
             setUser(response.user);
         } catch (error) {
-            setIsLoading(false);
+            console.error('Erro no registro:', error);
             throw error;
         } finally {
             setIsLoading(false);
         }
     };
-
     const logout = async () => {
         try {
             setIsLoading(true);

@@ -46,4 +46,19 @@ interface WeatherBody {
 export interface WeatherResponse {
     body: WeatherBody;
     createdAt: Date;
+    _id?: string;
+}
+export interface WeatherLogsPagination {
+    limit: number;
+    page: number;
+}
+
+export interface WeatherLogData {
+    data: WeatherLogResponse[];
+}
+export interface WeatherLogResponse {
+    data?: WeatherResponse[];
+    totalPages: number;
+    currentPage: number;
+    total: number;
 }

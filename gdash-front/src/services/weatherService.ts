@@ -1,6 +1,6 @@
-import { WeatherResponse } from '@/types/weather';
+import { WeatherLogResponse, WeatherLogsPagination, WeatherResponse } from '@/types/weather';
 import { apiClient } from '../lib/axios';
-import { InsightResponse } from '@/types/insight';
+import { InsightResponse } from '../types/insight';
 
 export class WeatherService {
     constructor() { }
@@ -30,5 +30,35 @@ export class WeatherService {
             console.error('Erro ao buscar insights:', error);
             throw error;
         }
+    }
+
+    static async getLogs({ limit, page }: WeatherLogsPagination): Promise<WeatherLogResponse> {
+        console.log(limit, page);
+        let filterStr;
+        if ((!page && limit) || (!limit && page)) {
+            if (page) {
+                filterStr = `?page=${page}`;
+            }
+            if (limit) {
+                filterStr = `?limit=${limit}`
+            }
+        }
+        if (limit && page) {
+            filterStr = `?limit=${limit}&page=${page}`;
+        }
+        const requestURL = `${this.BASE_PATH}/logs${filterStr}`;
+        const response = await apiClient.get<WeatherLogResponse>(
+            requestURL,
+        );
+        return response.data;
+    }
+
+    static async exportLogs(type: string): Promise<any> {
+        const response = await apiClient.post<any>(
+            `${this.BASE_PATH}/export`,
+            { type },
+            { responseType: 'blob' }
+        );
+        return response;
     }
 }
