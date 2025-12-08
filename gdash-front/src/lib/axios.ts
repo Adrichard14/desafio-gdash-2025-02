@@ -1,7 +1,7 @@
 import { AuthService } from '../services/authService';
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = 'http://localhost:3004/api';
+const API_BASE_URL = 'http://localhost:3006/api';
 const API_TIMEOUT = 10000;
 
 export const apiClient: AxiosInstance = axios.create({
