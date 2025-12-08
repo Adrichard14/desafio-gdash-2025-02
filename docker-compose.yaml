@@ -20,6 +20,8 @@ services:
     build:
       context: ./go-consumer
       dockerfile: Dockerfile
+    environment:
+      - RABBITMQ_CONNECTION_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
       - rabbitmq
       - python-producer
@@ -29,11 +31,12 @@ services:
       context: ./gdash-backend
       dockerfile: Dockerfile.nest
     ports:
-      - "3000:3000"
+      - "3006:3006"
     depends_on:
       - rabbitmq
       - mongodb
     environment:
+      PORT: 3006
       MONGO_URI: mongodb://root:example@mongodb:27017/gdash?authSource=admin
 
   react-frontend:
