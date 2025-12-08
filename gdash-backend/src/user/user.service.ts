@@ -3,6 +3,7 @@ import { User } from '../entity/user.entity';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { InjectModel } from '@nestjs/mongoose';
+import { CreateUserDto } from './create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,8 @@ export class UserService {
     return await this.userModel.find({ deleted: false });
   }
 
-  async addUser(name: string, email: string, password: string) {
+  async addUser(body: CreateUserDto) {
+    const { name, email, password } = body;
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException('An user with this e-mail already exists. Try again with another e-mail.')
@@ -24,7 +26,7 @@ export class UserService {
       password: hashedPassword,
     });
     const result = await newUser.save();
-    return result.id as string;
+    return { message: 'User added successfully', id: result.id as string }
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -37,7 +39,11 @@ export class UserService {
 
   async update(id: string, body: any) {
     const { name } = body;
-    return await this.userModel.findByIdAndUpdate(id, { name });
+    const result = await this.userModel.findByIdAndUpdate(id, body);
+    if (result) {
+      return { message: 'User successfully updated', id };
+    }
+    return new BadRequestException('Ocorreu um erro ao atualizar esse usuário');
   }
 
   async updateRefreshToken(id: string, refreshToken: string | null) {

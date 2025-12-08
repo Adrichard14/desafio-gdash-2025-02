@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { WeatherModule } from './weather/weather.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtGlobalModule } from './auth/jwt.module';
+import { PokeapiModule } from './pokeapi/pokeapi.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { JwtGlobalModule } from './auth/jwt.module';
     UserModule,
     AuthModule,
     WeatherModule,
+    PokeapiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
