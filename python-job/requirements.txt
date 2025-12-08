@@ -1,0 +1,4 @@
+schedule
+requests
+pika
+google-genai
