@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  python-producer:
+    build:
+      context: ./python-job
+      dockerfile: Dockerfile.python
+    depends_on:
+      - rabbitmq
+
+  go-consumer:
+    build:
+      context: ./go-consumer
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - python-producer
+
+  nest-backend:
+    build:
+      context: ./gdash-backend
+      dockerfile: Dockerfile.nest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rabbitmq
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://root:example@mongodb:27017/gdash?authSource=admin
+
+  react-frontend:
+    build:
+      context: ./gdash-front
+      dockerfile: Dockerfile.react
+    ports:
+      - "8080:80"
+    depends_on:
+      - nest-backend
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: gdash
+    volumes:
+      - ./mongo-data:/data/db
